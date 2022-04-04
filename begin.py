@@ -9,11 +9,15 @@ def echo(update, context):
         update.message.reply_text(time.asctime())
     elif update.message.text == "/date":
         update.message.reply_text(time.strftime('%d-%m-%Y'))
+    elif update.message.text == "/start":
+        update.message.reply_text('Привет, я - книжный бот! Я помогу тебе в поиске нужной книг')
+        update.message.reply_text('Для начала введи своё имя')
+        update.message.reply_text('Если тебе будет что-то неясно, введи слово: "/help"')
+    elif update.message.text == "/help":
+        update.message.reply_texе()
 
 
 def remove_job_if_exists(name, context):
-    """Удаляем задачу по имени.
-    Возвращаем True если задача была успешно удалена."""
     current_jobs = context.job_queue.get_jobs_by_name(name)
     if not current_jobs:
         return False
@@ -22,21 +26,17 @@ def remove_job_if_exists(name, context):
     return True
 
 
-# Обычный обработчик, как и те, которыми мы пользовались раньше.
 def set_timer(update, context):
     """Добавляем задачу в очередь"""
     chat_id = update.message.chat_id
     try:
-        # args[0] должен содержать значение аргумента
-        # (секунды таймера)
         due = int(context.args[0])
         if due < 0:
             update.message.reply_text(
                 'Извините, не умеем возвращаться в прошлое')
             return
 
-        # Добавляем задачу в очередь
-        # и останавливаем предыдущую (если она была)
+
         job_removed = remove_job_if_exists(
             str(chat_id),
             context
@@ -71,7 +71,7 @@ def unset_timer(update, context):
 
 
 def main():
-    updater = Updater('5205369728:AAGwX-ihMJNVdn-gK-q6IUKTt1cgaK09MK8', use_context=True)
+    updater = Updater('5268756137:AAHyoEV3NSDQaQ0K6uszX_qJkL4omYGQtro', use_context=True)
     dp = updater.dispatcher
     text_handler = MessageHandler(Filters.text, echo)
     dp.add_handler(CommandHandler("set_timer", set_timer))
