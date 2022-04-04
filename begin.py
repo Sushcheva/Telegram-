@@ -47,7 +47,7 @@ def name(update, context):
             context=chat_id,
             name=str(chat_id)
         )
-        text = f'Вернусь через {due} секунд!'
+        text = f'Ваше имя {due}!'
         if job_removed:
             text += ' Старая задача удалена.'
         # Присылаем сообщение о том, что всё получилось.
@@ -79,6 +79,5 @@ def main():
     updater.idle()
 
 
-# Запускаем функцию main() в случае запуска скрипта.
 if __name__ == '__main__':
     main()
