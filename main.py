@@ -61,7 +61,16 @@ def search_by_name(updatee, context):
     d = context[0]
     resp = req.get(
         f"https://www.googleapis.com/books/v1/volumes?q={d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
-    print(resp.json())
+    z = resp.json()['items']
+    f = 0
+    for el in z:
+        d = []
+        x = el['volumeInfo']
+        for k, v in x.items():
+            f += 1
+            if f <= 5:
+                d.append(str(str(k) + ': ' + str(v)))
+
 
 
 def search_by_author(updatee, context):
