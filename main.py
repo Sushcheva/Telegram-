@@ -57,11 +57,12 @@ def site(update, context):
         "Сайт: http://www.yandex.ru/company")
 
 
-def search_by_name(updatee, context):
-    d = context[0]
+def search_by_name(update, context):
+    d = context.args[0]
     resp = req.get(
-        f"https://www.googleapis.com/books/v1/volumes?q={d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
+        f"https://www.googleapis.com/books/v1/volumes?q={d}+intitle:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
     z = resp.json()['items']
+    print(resp.json())
     f = 0
     for el in z:
         d = []
@@ -70,6 +71,15 @@ def search_by_name(updatee, context):
             f += 1
             if f <= 5:
                 d.append(str(str(k) + ': ' + str(v)))
+        update.message.reply_text('\n'.join(d))
+        update.message.reply_text(x['averageRating'])
+        context.bot.send_photo(
+          update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
+          # Ссылка на static API, по сути, ссылка на картинку.
+          # Телеграму можно передать прямо её, не скачивая предварительно карту.
+          x['imageLinks']['smallThumbnail'],
+          caption="Нашёл:"
+        )
 
 
 
