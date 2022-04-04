@@ -5,16 +5,17 @@ import datetime
 
 
 def echo(update, context):
-    if update.message.text == "/time":
-        update.message.reply_text(time.asctime())
-    elif update.message.text == "/date":
-        update.message.reply_text(time.strftime('%d-%m-%Y'))
-    elif update.message.text == "/start":
-        update.message.reply_text('Привет, я - книжный бот! Я помогу тебе в поиске нужной книг')
+    if update.message.text == "/start":
+        update.message.reply_text('Привет, я - книжный бот! Я помогу тебе в поиске нужной книги')
         update.message.reply_text('Для начала введи своё имя')
         update.message.reply_text('Если тебе будет что-то неясно, введи слово: "/help"')
     elif update.message.text == "/help":
-        update.message.reply_texе()
+        update.message.reply_texе(' чтобы начать общение сначала введите "/start",'
+                                  'чтобы закончить диалог введите "/end"')
+    elif update.message.text == "/time":
+        update.message.reply_text(time.asctime())
+    elif update.message.text == "/date":
+        update.message.reply_text(time.strftime('%d-%m-%Y'))
 
 
 def remove_job_if_exists(name, context):
@@ -26,8 +27,7 @@ def remove_job_if_exists(name, context):
     return True
 
 
-def set_timer(update, context):
-    """Добавляем задачу в очередь"""
+def name(update, context):
     chat_id = update.message.chat_id
     try:
         due = int(context.args[0])
@@ -58,7 +58,6 @@ def set_timer(update, context):
 
 
 def task(context):
-    """Выводит сообщение"""
     job = context.job
     context.bot.send_message(job.context, text='Вернулся!')
 
@@ -74,7 +73,7 @@ def main():
     updater = Updater('5268756137:AAHyoEV3NSDQaQ0K6uszX_qJkL4omYGQtro', use_context=True)
     dp = updater.dispatcher
     text_handler = MessageHandler(Filters.text, echo)
-    dp.add_handler(CommandHandler("set_timer", set_timer))
+    dp.add_handler(CommandHandler("name", name))
     dp.add_handler(text_handler)
     updater.start_polling()
     updater.idle()
