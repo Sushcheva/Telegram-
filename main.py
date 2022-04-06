@@ -60,13 +60,15 @@ def site(update, context):
 def search_by_name(update, context):
     d = ''.join(context.args)
     resp = req.get(
-        f"https://www.googleapis.com/books/v1/volumes?q={d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
+        f"https://www.googleapis.com/books/v1/volumes?q={d}+inauthor:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
     z = resp.json()['items']
     print(resp.json())
     f = 0
     for el in z:
         d = []
+        f = 0
         x = el['volumeInfo']
+        print(x)
         for k, v in x.items():
             f += 1
             if f <= 5:
