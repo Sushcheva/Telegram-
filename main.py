@@ -1,7 +1,7 @@
 import requests as req
 import logging
-from telegram.ext import Updater, MessageHandler, Filters, CommandHandler
-from telegram import ReplyKeyboardMarkup
+from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, CallbackQueryHandler
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardRemove
 
 # Запускаем логгирование
@@ -57,6 +57,20 @@ def site(update, context):
         "Сайт: http://www.yandex.ru/company")
 
 
+def button(update, _):
+    query = update.callback_query
+    variant = query.data
+
+    # `CallbackQueries` требует ответа, даже если
+    # уведомление для пользователя не требуется, в противном
+    #  случае у некоторых клиентов могут возникнуть проблемы.
+    # смотри https://core.telegram.org/bots/api#callbackquery.
+    query.answer()
+    # редактируем сообщение, тем самым кнопки
+    # в чате заменятся на этот ответ.
+    query.edit_message_text(text=f"Выбранный вариант: {variant}")
+
+
 def search_by_name(update, context):
     d = ''.join(context.args)
     resp = req.get(
@@ -85,7 +99,6 @@ def search_by_name(update, context):
         update.message.reply_text(x['averageRating'])
 
 
-
 def search_by_author(updatee, context):
     pass
 
@@ -96,13 +109,14 @@ def work_time(update, context):
 
 
 def search_book(update, context):
-    reply_keyboard = [['/search_by_author', '/search_by_name']
-                      ]
-    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
-    update.message.reply_text(
-        "По какому параметру выполнить поиск?",
-        reply_markup=markup
-    )
+    keyboard = [
+        [
+            InlineKeyboardButton("Искать по названию", callback_data='/search_by_name'),
+            InlineKeyboardButton("Искать по автору", callback_data='/search_by_author'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text('как будем проводить поиск?', reply_markup=reply_markup)
 
 
 def main():
@@ -118,6 +132,7 @@ def main():
     dp.add_handler(CommandHandler("search_by_author", search_by_author))
     dp.add_handler(CommandHandler("search_by_name", search_by_name))
     dp.add_handler(CommandHandler("work_time", work_time))
+    updater.dispatcher.add_handler(CallbackQueryHandler(button))
     dp.add_handler(CommandHandler("help", help))
     updater.start_polling()
 
