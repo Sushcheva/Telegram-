@@ -1,83 +1,81 @@
 from telegram.ext import Updater, MessageHandler, Filters
-from telegram.ext import CallbackContext, CommandHandler
-import time
-import datetime
+from telegram.ext import CallbackContext, CommandHandler, ConversationHandler
+from data import db_session
+
+TOKEN = '5268756137:AAHyoEV3NSDQaQ0K6uszX_qJkL4omYGQtro'
+WEATHER_TOKEN = ''
+current_area = ''
+new_name = ''
 
 
-def echo(update, context):
-    if update.message.text == "/start":
-        update.message.reply_text('Привет, я - книжный бот! Я помогу тебе в поиске нужной книги')
-        update.message.reply_text('Для начала введи своё имя')
-        update.message.reply_text('Если тебе будет что-то неясно, введи слово: "/help"')
-    elif update.message.text == "/help":
-        update.message.reply_texе(' чтобы начать общение сначала введите "/start",'
-                                  'чтобы закончить диалог введите "/end"')
-    elif update.message.text == "/time":
-        update.message.reply_text(time.asctime())
-    elif update.message.text == "/date":
-        update.message.reply_text(time.strftime('%d-%m-%Y'))
-
-
-def remove_job_if_exists(name, context):
-    current_jobs = context.job_queue.get_jobs_by_name(name)
-    if not current_jobs:
-        return False
-    for job in current_jobs:
-        job.schedule_removal()
-    return True
+def new(update, context):
+    update.message.reply_text('''Здравствуйте! Это Книжный бот!
+    Чтобы начать поиск книг, введите свой никнейм для 
+    регистрации. Если хотите закончить - команду /stop. ''')
+    return 1
 
 
 def name(update, context):
-    chat_id = update.message.chat_id
-    try:
-        due = int(context.args[0])
-        if due < 0:
-            update.message.reply_text(
-                'Извините, не умеем возвращаться в прошлое')
-            return
+    global new_name
+    new_name = update.message.text
+    update.message.reply_text('Теперь придумайте пароль')
+    return 2
 
 
-        job_removed = remove_job_if_exists(
-            str(chat_id),
-            context
-        )
-        context.job_queue.run_once(
-            task,
-            due,
-            context=chat_id,
-            name=str(chat_id)
-        )
-        text = f'Ваше имя {due}!'
-        if job_removed:
-            text += ' Старая задача удалена.'
-        # Присылаем сообщение о том, что всё получилось.
-        update.message.reply_text(text)
-
-    except (IndexError, ValueError):
-        update.message.reply_text('Использование: /set <секунд>')
+def stop(update, context):
+    update.message.reply_text('stop')
+    return ConversationHandler.END
 
 
-def task(context):
-    job = context.job
-    context.bot.send_message(job.context, text='Вернулся!')
+def help(update, context):
+    update.message.reply_text('Help')
 
 
-def unset_timer(update, context):
-    chat_id = update.message.chat_id
-    job_removed = remove_job_if_exists(str(chat_id), context)
-    text = 'Хорошо, вернулся сейчас!' if job_removed else 'Нет активного таймера.'
-    update.message.reply_text(text)
+def start(update, context):
+    update.message.reply_text('Здравствуйте! Это Книжный бот!'
+                              'Чтобы начать поиск книг, введите свой никнейм для '
+                              'регистрации. Если хотите закончить - команду /stop.')
+
+
+def password(update, context):
+    password = update.message.text
+    db_session.global_init("db/books.db")
+    db_sess = db_session.create_session()
+
+    user = User()
+    user.name = new_name
+    user.password = password
+    user.latest_city = ''
+    user.constant_city = ''
+    db_sess.add(user)
+    db_sess.commit()
+    update.message.reply_text('Поздравляем! Вы зарегестрировались!')
+    return ConversationHandler.END
 
 
 def main():
-    updater = Updater('5268756137:AAHyoEV3NSDQaQ0K6uszX_qJkL4omYGQtro', use_context=True)
+    updater = Updater(TOKEN, use_context=True)
+
     dp = updater.dispatcher
-    text_handler = MessageHandler(Filters.text, echo)
-    dp.add_handler(CommandHandler("name", name))
+    text_handler = MessageHandler(Filters.text, name)
+    dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('help', help))
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('new_person', new)],
+        states={
+            1: [MessageHandler(Filters.text & ~Filters.command, name)],
+            2: [MessageHandler(Filters.text & ~Filters.command, password)]
+        },
+        fallbacks=[CommandHandler('stop', stop)]
+    )
+
+    dp.add_handler(conv_handler)
     dp.add_handler(text_handler)
     updater.start_polling()
+
     updater.idle()
 
 
 if __name__ == '__main__':
+    db_session.global_init("db/books1.db")
     main()
