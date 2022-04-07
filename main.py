@@ -68,13 +68,14 @@ def button(update, _):
     query.answer()
     # редактируем сообщение, тем самым кнопки
     # в чате заменятся на этот ответ.
-    query.edit_message_text(text=f"Выбранный вариант: {variant}")
+    query.edit_message_text(text=variant)
+
 
 
 def search_by_name(update, context):
     d = ''.join(context.args)
     resp = req.get(
-        f"https://www.googleapis.com/books/v1/volumes?q={d}+inauthor:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
+        f"https://www.googleapis.com/books/v1/volumes?q={d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
     z = resp.json()['items']
     print(resp.json())
     f = 0
@@ -111,8 +112,8 @@ def work_time(update, context):
 def search_book(update, context):
     keyboard = [
         [
-            InlineKeyboardButton("Искать по названию", callback_data='/search_by_name'),
-            InlineKeyboardButton("Искать по автору", callback_data='/search_by_author'),
+            InlineKeyboardButton("Искать по названию", callback_data='Введите название'),
+            InlineKeyboardButton("Искать по автору", callback_data='Введите автора'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
