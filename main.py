@@ -57,6 +57,7 @@ def site(update, context):
         "Сайт: http://www.yandex.ru/company")
 
 def param(update, context):
+    print(x)
     context.user_data['dan'] = update.message.text
     search_by_name(update, context)
 
@@ -159,8 +160,8 @@ def main():
     dp.add_handler(CommandHandler("search_by_author", search_by_author))
     dp.add_handler(CommandHandler("search_by_name", search_by_name))
     dp.add_handler(CommandHandler("work_time", work_time))
-    dp.add_handler(MessageHandler(Filters.text, 'param', pass_user_data=True))
-    updater.dispatcher.add_handler(CallbackQueryHandler(button))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, 'param', pass_user_data=True))
+    dp.add_handler(CallbackQueryHandler(button))
     dp.add_handler(CommandHandler("help", help))
     updater.start_polling()
 
