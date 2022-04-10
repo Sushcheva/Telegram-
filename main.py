@@ -57,11 +57,16 @@ def site(update, context):
         "Сайт: http://www.yandex.ru/company")
 
 def param(update, context):
-    print(x)
+    global variant
+    print(update.message.text)
     context.user_data['dan'] = update.message.text
-    search_by_name(update, context)
+    if variant == 'Введите название':
+        search_by_name(update, context)
+    else:
+        search_by_author(update, context)
 
 def button(update, _):
+    global variant
     query = update.callback_query
     variant = query.data
 
@@ -77,7 +82,7 @@ def button(update, _):
 def search_by_name(update, context):
     d = context.user_data['dan']
     resp = req.get(
-        f"https://www.googleapis.com/books/v1/volumes?q={d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
+        f"https://www.googleapis.com/books/v1/volumes?q=intitle+{d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
     z = resp.json()['items']
     print(resp.json())
     f = 0
@@ -102,10 +107,10 @@ def search_by_name(update, context):
         update.message.reply_text(x['averageRating'])
 
 
-def search_by_author(updatee, context):
-    d = ''.join(context.args)
+def search_by_author(update, context):
+    d = context.user_data['dan']
     resp = req.get(
-        f"https://www.googleapis.com/books/v1/volumes?q={d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
+        f"https://www.googleapis.com/books/v1/volumes?q=inauthor+{d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
     z = resp.json()['items']
     print(resp.json())
     f = 0
@@ -160,7 +165,7 @@ def main():
     dp.add_handler(CommandHandler("search_by_author", search_by_author))
     dp.add_handler(CommandHandler("search_by_name", search_by_name))
     dp.add_handler(CommandHandler("work_time", work_time))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, 'param', pass_user_data=True))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True))
     dp.add_handler(CallbackQueryHandler(button))
     dp.add_handler(CommandHandler("help", help))
     updater.start_polling()
