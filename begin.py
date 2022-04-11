@@ -41,7 +41,6 @@ def password(update, context):
     password = update.message.text
     db_session.global_init("db/books.db")
     db_sess = db_session.create_session()
-
     user = User()
     user.name = new_name
     user.password = password
