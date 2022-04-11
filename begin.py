@@ -4,8 +4,8 @@ from data import db_session
 
 TOKEN = '5268756137:AAHyoEV3NSDQaQ0K6uszX_qJkL4omYGQtro'
 WEATHER_TOKEN = ''
-current_area = ''
 new_name = ''
+current_area = ''
 
 
 def new(update, context):
