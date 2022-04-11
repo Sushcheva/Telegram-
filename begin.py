@@ -27,14 +27,14 @@ def stop(update, context):
     return ConversationHandler.END
 
 
-def help(update, context):
-    update.message.reply_text('Help')
-
-
 def start(update, context):
     update.message.reply_text('Здравствуйте! Это Книжный бот!'
                               'Чтобы начать поиск книг, введите свой никнейм для '
                               'регистрации. Если хотите закончить - команду /stop.')
+
+
+def help(update, context):
+    update.message.reply_text('Help')
 
 
 def password(update, context):
