@@ -9,6 +9,19 @@ new_name = ''
 current_area = ''
 
 
+def password(update, context):
+    password = update.message.text
+    db_session.global_init("db/books.db")
+    db_sess = db_session.create_session()
+    user = User()
+    user.name = new_name
+    user.password = password
+    user.latest_city = ''
+    user.constant_city = ''
+    db_sess.add(user)
+    db_sess.commit()
+    update.message.reply_text('Поздравляем! Вы зарегестрировались!')
+    return ConversationHandler.END
 def new(update, context):
     update.message.reply_text('''Здравствуйте! Это Книжный бот!
     Чтобы начать поиск книг, введите свой никнейм для 
@@ -36,21 +49,6 @@ def start(update, context):
 
 def help(update, context):
     update.message.reply_text('Help')
-
-
-def password(update, context):
-    password = update.message.text
-    db_session.global_init("db/books.db")
-    db_sess = db_session.create_session()
-    user = User()
-    user.name = new_name
-    user.password = password
-    user.latest_city = ''
-    user.constant_city = ''
-    db_sess.add(user)
-    db_sess.commit()
-    update.message.reply_text('Поздравляем! Вы зарегестрировались!')
-    return ConversationHandler.END
 
 
 def main():
