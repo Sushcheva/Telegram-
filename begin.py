@@ -2,6 +2,7 @@ from telegram.ext import Updater, MessageHandler, Filters
 from telegram.ext import CallbackContext, CommandHandler, ConversationHandler
 from data import db_session
 
+
 TOKEN = '5268756137:AAHyoEV3NSDQaQ0K6uszX_qJkL4omYGQtro'
 WEATHER_TOKEN = ''
 new_name = ''
