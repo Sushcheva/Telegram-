@@ -1,6 +1,8 @@
 import requests as req
+import csv
 import logging
-from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, CallbackQueryHandler
+from telegram.ext import Updater,ConversationHandler,\
+    MessageHandler, Filters, CommandHandler, CallbackQueryHandler
 from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardRemove
 
@@ -86,6 +88,7 @@ def param(update, context):
 
 def button(update, _):
     global variant
+    global choose
     query = update.callback_query
     variant = query.data
 
@@ -98,8 +101,8 @@ def button(update, _):
         if variant == 'Введите название' or variant == 'Введите автора':
             query.edit_message_text(text=variant)
         else:
-            f.write(choose)
-    query.edit_message_text(text=variant)
+            f.write(variant)
+    query.edit_message_text(text='Уверены?')
 
 
 def first_response(update, context):
@@ -140,20 +143,17 @@ def second_response(update, context):
 def third_response(update, context):
     # Это ответ на первый вопрос.
     # Мы можем использовать его во втором вопросе.
-    locality = update.message.text
-    update.message.reply_text(
-        f"Какая погода в городе {locality}?")
     keyboard = [
         [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
-            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+            InlineKeyboardButton("Опытный следователь, расследующий самые загадочные преступления", callback_data='det'),
+            InlineKeyboardButton("Простой парень, который влюбился по уши, но весь мир против него", callback_data='lub'),
+            InlineKeyboardButton("Сын маньяка, который добрый в душе, но на него давит отец",
+                                 callback_data='thril'),
+            InlineKeyboardButton("Капитан звездолета, который каждый день отправляется в космос за новыми приключениями", callback_data='fen'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    update.message.reply_text("Главный герой вашей мечты...", reply_markup=reply_markup)
     # Следующее текстовое сообщение будет обработано
     # обработчиком states[2]
     return 4
@@ -161,10 +161,7 @@ def third_response(update, context):
 
 def fourth_response(update, context):
     # Это ответ на первый вопрос.
-    # Мы можем использовать его во втором вопросе.
-    locality = update.message.text
-    update.message.reply_text(
-        f"Какая погода в городе {locality}?")
+    # Мы можем использовать его во втором вопрос
     keyboard = [
         [
             InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
@@ -183,10 +180,7 @@ def fourth_response(update, context):
 
 def fifth_response(update, context):
     # Это ответ на первый вопрос.
-    # Мы можем использовать его во втором вопросе.
-    locality = update.message.text
-    update.message.reply_text(
-        f"Какая погода в городе {locality}?")
+    # Мы можем использовать его во втором вопросе
     keyboard = [
         [
             InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
@@ -206,9 +200,6 @@ def fifth_response(update, context):
 def sixth_response(update, context):
     # Это ответ на первый вопрос.
     # Мы можем использовать его во втором вопросе.
-    locality = update.message.text
-    update.message.reply_text(
-        f"Какая погода в городе {locality}?")
     keyboard = [
         [
             InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
@@ -335,7 +326,7 @@ def main():
     conv_handler = ConversationHandler(
         # Точка входа в диалог.
         # В данном случае — команда /start. Она задаёт первый вопрос.
-        entry_points=[CommandHandler('test', start)],
+        entry_points=[CommandHandler('test', test)],
 
         # Состояние внутри диалога.
         # Вариант с двумя обработчиками, фильтрующими текстовые сообщения.
@@ -360,7 +351,6 @@ def main():
     dp.add_handler(conv_handler)
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("site", site))
-    dp.add_handler(CommandHandler("test", test))
     dp.add_handler(CommandHandler("search_book", search_book))
     dp.add_handler(CommandHandler("search_by_author", search_by_author))
     dp.add_handler(CommandHandler("search_by_name", search_by_name))
