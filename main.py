@@ -39,8 +39,18 @@ def help(update, context):
 
 
 def test(update, context):
-    update.message.reply_text(
-        "Скоро здесь можно будет пройти тест на жанры, и получить список самых рекомендуемых книг по нему")
+    keyboard = [
+        [
+            InlineKeyboardButton("Искать по названию", callback_data='Введите название'),
+            InlineKeyboardButton("Искать по автору", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text('как будем проводить поиск?', reply_markup=reply_markup)
+    resp = req.get(
+        f"https://www.googleapis.com/books/v1/volumes?q=intitle+{d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
+    z = resp.json()['items']
+    print(resp.json())
 
 
 def address(update, context):
@@ -75,6 +85,11 @@ def button(update, _):
     #  случае у некоторых клиентов могут возникнуть проблемы.
     # смотри https://core.telegram.org/bots/api#callbackquery.
     query.answer()
+    with open('files/Толстой.txt', 'w') as f:
+        if variant == 'Введите название' or variant == 'Введите автора':
+            query.edit_message_text(text=variant)
+        else:
+            f.write(choose)
     query.edit_message_text(text=variant)
 
 
@@ -157,7 +172,34 @@ def main():
     dp.add_handler(CommandHandler("close", close_keyboard))
     dp.add_handler(CommandHandler("address", address))
     dp.add_handler(CommandHandler("phone", phone))
+    conv_handler = ConversationHandler(
+        # Точка входа в диалог.
+        # В данном случае — команда /start. Она задаёт первый вопрос.
+        entry_points=[CommandHandler('test', start)],
 
+        # Состояние внутри диалога.
+        # Вариант с двумя обработчиками, фильтрующими текстовые сообщения.
+        states={
+            # Функция читает ответ на первый вопрос и задаёт второй.
+            1: [MessageHandler(Filters.text & ~Filters.command, first_response)],
+            # Функция читает ответ на второй вопрос и завершает диалог.
+            2: [MessageHandler(Filters.text & ~Filters.command, second_response)],
+            3: [MessageHandler(Filters.text & ~Filters.command, third_response)],
+            # Функция читает ответ на второй вопрос и завершает диалог.
+            4: [MessageHandler(Filters.text & ~Filters.command, fourth_response)],
+            5: [MessageHandler(Filters.text & ~Filters.command, fifth_response)],
+            # Функция читает ответ на второй вопрос и завершает диалог.
+            6: [MessageHandler(Filters.text & ~Filters.command, sixth_response)],
+            7: [MessageHandler(Filters.text & ~Filters.command, seventh_response)],
+            # Функция читает ответ на второй вопрос и завершает диалог.
+            8: [MessageHandler(Filters.text & ~Filters.command, eith_response)]
+        },
+
+        # Точка прерывания диалога. В данном случае — команда /stop.
+        fallbacks=[CommandHandler('stop', stop)]
+    )
+
+    dp.add_handler(conv_handler)
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("site", site))
     dp.add_handler(CommandHandler("test", test))
