@@ -45,11 +45,11 @@ def test(update, context):
     )
     keyboard = [
         [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("Дворецкий", callback_data='det'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='fen'),
             InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+                                 callback_data='thril'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='lub'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -76,10 +76,11 @@ def site(update, context):
 def param(update, context):
     global variant
     print(update.message.text)
-    context.user_data['dan'] = update.message.text
     if variant == 'Введите название':
+        context.user_data['dan'] = update.message.text
         search_by_name(update, context)
-    else:
+    elif variant == 'Введите автора':
+        context.user_data['dan'] = update.message.text
         search_by_author(update, context)
 
 
@@ -93,7 +94,7 @@ def button(update, _):
     #  случае у некоторых клиентов могут возникнуть проблемы.
     # смотри https://core.telegram.org/bots/api#callbackquery.
     query.answer()
-    with open('files/Толстой.txt', 'w') as f:
+    with open('Толстой.txt', 'w') as f:
         if variant == 'Введите название' or variant == 'Введите автора':
             query.edit_message_text(text=variant)
         else:
@@ -102,33 +103,24 @@ def button(update, _):
 
 
 def first_response(update, context):
-    # Это ответ на первый вопрос.
-    # Мы можем использовать его во втором вопросе.
-    locality = update.message.text
-    update.message.reply_text(
-        f"Какая погода в городе {locality}?")
-    # Следующее текстовое сообщение будет обработано
     keyboard = [
         [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
-            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+            InlineKeyboardButton("Удивляться фантазии автора и полностью погружаться в новые миры", callback_data='fen'),
+            InlineKeyboardButton("Мне нравится разбираться в запутанных сюжетных линиях", callback_data='det'),
+            InlineKeyboardButton("Мне нравится переживать эмоции персонажей. Радоваться и скорбить вместе с ними",
+                                 callback_data='lub'),
+            InlineKeyboardButton("Нравится когда книга немного пугает и заставляет копаться в себе", callback_data='thril'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    update.message.reply_text("Что вам больше всего нравится в процессе чтения?", reply_markup=reply_markup)
     # обработчиком states[2]
     return 2
 
 
 def second_response(update, context):
     # Это ответ на первый вопрос.
-    # Мы можем использовать его во втором вопросе.
-    locality = update.message.text
-    update.message.reply_text(
-        f"Какая погода в городе {locality}?")
+    # Мы можем использовать его во втором вопроc
     keyboard = [
         [
             InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
@@ -236,41 +228,21 @@ def sixth_response(update, context):
 def seventh_response(update, context):
     # Это ответ на первый вопрос.
     # Мы можем использовать его во втором вопросе.
-    locality = update.message.text
-    update.message.reply_text(
-        f"Какая погода в городе {locality}?")
-    keyboard = [
-        [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
-            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
-    # Следующее текстовое сообщение будет обработано
-    # обработчиком states[2]
-    return 8
-
-
-def eith_response(update, context):
-    # Это ответ на первый вопрос.
-    # Мы можем использовать его во втором вопросе.
-    locality = update.message.text
-    update.message.reply_text(
-        f"Какая погода в городе {locality}?")
-    keyboard = [
-        [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
-            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text('Подсчет результатов...')
+    with open('test.csv', encoding="utf8") as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';', quotechar='"')
+        expensive = sorted(reader, key=lambda x: int(x['price']), reverse=True)
+    f = open("Толстой.txt", encoding="utf8")
+    lines = f.readlines()
+    f.close()
+    update.message.reply_text('\n'.join(d))
+    context.bot.send_photo(
+        update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
+        # Ссылка на static API, по сути, ссылка на картинку.
+        # Телеграму можно передать прямо её, не скачивая предварительно карту.
+        x['imageLinks']['smallThumbnail'],
+        caption="Нашёл:"
+    )
     update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
     # Следующее текстовое сообщение будет обработано
     # обработчиком states[2]
@@ -378,9 +350,7 @@ def main():
             5: [MessageHandler(Filters.text & ~Filters.command, fifth_response)],
             # Функция читает ответ на второй вопрос и завершает диалог.
             6: [MessageHandler(Filters.text & ~Filters.command, sixth_response)],
-            7: [MessageHandler(Filters.text & ~Filters.command, seventh_response)],
-            # Функция читает ответ на второй вопрос и завершает диалог.
-            8: [MessageHandler(Filters.text & ~Filters.command, eith_response)]
+            7: [MessageHandler(Filters.text & ~Filters.command, seventh_response)]
         },
 
         # Точка прерывания диалога. В данном случае — команда /stop.
