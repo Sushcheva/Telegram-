@@ -164,15 +164,15 @@ def fourth_response(update, context):
     # Мы можем использовать его во втором вопрос
     keyboard = [
         [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
-            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+            InlineKeyboardButton("способ развлечения", callback_data='Введите название'),
+            InlineKeyboardButton("способ отдыха", callback_data='Введите автора'),
+            InlineKeyboardButton("способ познания мира",
                                  callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+            InlineKeyboardButton("учебник", callback_data='Введите автора'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    update.message.reply_text("Книга для вас - это в первую очередь…", reply_markup=reply_markup)
     # Следующее текстовое сообщение будет обработано
     # обработчиком states[2]
     return 5
@@ -183,15 +183,15 @@ def fifth_response(update, context):
     # Мы можем использовать его во втором вопросе
     keyboard = [
         [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
-            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+            InlineKeyboardButton("Эх, вот б мне так", callback_data='lub'),
+            InlineKeyboardButton("Да… интересно, но хорошо, что у меня не так", callback_data='thril'),
+            InlineKeyboardButton("Так вот оно что!",
+                                 callback_data='det'),
+            InlineKeyboardButton(" Как такое вообще выдумать можно?!", callback_data='fen'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    update.message.reply_text("С какой фразой вы хотите закрывать книгу?", reply_markup=reply_markup)
     # Следующее текстовое сообщение будет обработано
     # обработчиком states[2]
     return 6
@@ -202,15 +202,15 @@ def sixth_response(update, context):
     # Мы можем использовать его во втором вопросе.
     keyboard = [
         [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
-            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+            InlineKeyboardButton("Агата Кристи", callback_data='det'),
+            InlineKeyboardButton("Стивен Кинг", callback_data='thril'),
+            InlineKeyboardButton("Терри Пратчетт",
+                                 callback_data='fen'),
+            InlineKeyboardButton("Джейн Остин", callback_data='lub'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    update.message.reply_text("Выберите автора, который вам больше по душе.", reply_markup=reply_markup)
     # Следующее текстовое сообщение будет обработано
     # обработчиком states[2]
     return 7
