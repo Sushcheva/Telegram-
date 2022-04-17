@@ -39,18 +39,24 @@ def help(update, context):
 
 
 def test(update, context):
+    update.message.reply_text(
+        "Привет. Пройдите небольшой опрос, пожалуйста!\n"
+        "Вы можете прервать опрос, послав команду /stop."
+    )
     keyboard = [
         [
-            InlineKeyboardButton("Искать по названию", callback_data='Введите название'),
-            InlineKeyboardButton("Искать по автору", callback_data='Введите автора'),
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text('как будем проводить поиск?', reply_markup=reply_markup)
-    resp = req.get(
-        f"https://www.googleapis.com/books/v1/volumes?q=intitle+{d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
-    z = resp.json()['items']
-    print(resp.json())
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # Число-ключ в словаре states —
+    # втором параметре ConversationHandler'а.
+    return 1
 
 
 def address(update, context):
@@ -66,6 +72,7 @@ def site(update, context):
     update.message.reply_text(
         "Сайт: http://www.yandex.ru/company")
 
+
 def param(update, context):
     global variant
     print(update.message.text)
@@ -74,6 +81,7 @@ def param(update, context):
         search_by_name(update, context)
     else:
         search_by_author(update, context)
+
 
 def button(update, _):
     global variant
@@ -92,6 +100,181 @@ def button(update, _):
             f.write(choose)
     query.edit_message_text(text=variant)
 
+
+def first_response(update, context):
+    # Это ответ на первый вопрос.
+    # Мы можем использовать его во втором вопросе.
+    locality = update.message.text
+    update.message.reply_text(
+        f"Какая погода в городе {locality}?")
+    # Следующее текстовое сообщение будет обработано
+    keyboard = [
+        [
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # обработчиком states[2]
+    return 2
+
+
+def second_response(update, context):
+    # Это ответ на первый вопрос.
+    # Мы можем использовать его во втором вопросе.
+    locality = update.message.text
+    update.message.reply_text(
+        f"Какая погода в городе {locality}?")
+    keyboard = [
+        [
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # Следующее текстовое сообщение будет обработано
+    # обработчиком states[2]
+    return 3
+
+
+def third_response(update, context):
+    # Это ответ на первый вопрос.
+    # Мы можем использовать его во втором вопросе.
+    locality = update.message.text
+    update.message.reply_text(
+        f"Какая погода в городе {locality}?")
+    keyboard = [
+        [
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # Следующее текстовое сообщение будет обработано
+    # обработчиком states[2]
+    return 4
+
+
+def fourth_response(update, context):
+    # Это ответ на первый вопрос.
+    # Мы можем использовать его во втором вопросе.
+    locality = update.message.text
+    update.message.reply_text(
+        f"Какая погода в городе {locality}?")
+    keyboard = [
+        [
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # Следующее текстовое сообщение будет обработано
+    # обработчиком states[2]
+    return 5
+
+
+def fifth_response(update, context):
+    # Это ответ на первый вопрос.
+    # Мы можем использовать его во втором вопросе.
+    locality = update.message.text
+    update.message.reply_text(
+        f"Какая погода в городе {locality}?")
+    keyboard = [
+        [
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # Следующее текстовое сообщение будет обработано
+    # обработчиком states[2]
+    return 6
+
+
+def sixth_response(update, context):
+    # Это ответ на первый вопрос.
+    # Мы можем использовать его во втором вопросе.
+    locality = update.message.text
+    update.message.reply_text(
+        f"Какая погода в городе {locality}?")
+    keyboard = [
+        [
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # Следующее текстовое сообщение будет обработано
+    # обработчиком states[2]
+    return 7
+
+
+def seventh_response(update, context):
+    # Это ответ на первый вопрос.
+    # Мы можем использовать его во втором вопросе.
+    locality = update.message.text
+    update.message.reply_text(
+        f"Какая погода в городе {locality}?")
+    keyboard = [
+        [
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # Следующее текстовое сообщение будет обработано
+    # обработчиком states[2]
+    return 8
+
+
+def eith_response(update, context):
+    # Это ответ на первый вопрос.
+    # Мы можем использовать его во втором вопросе.
+    locality = update.message.text
+    update.message.reply_text(
+        f"Какая погода в городе {locality}?")
+    keyboard = [
+        [
+            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
+            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
+            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
+                                 callback_data='Введите автора'),
+            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    # Следующее текстовое сообщение будет обработано
+    # обработчиком states[2]
+    return ConversationHandler.END
 
 
 def search_by_name(update, context):
@@ -164,6 +347,11 @@ def search_book(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text('как будем проводить поиск?', reply_markup=reply_markup)
+
+
+def stop(update, context):
+    update.message.reply_text("Всего доброго!")
+    return ConversationHandler.END
 
 
 def main():
