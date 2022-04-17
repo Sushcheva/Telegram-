@@ -1,7 +1,7 @@
 import requests as req
 import csv
 import logging
-from telegram.ext import Updater,ConversationHandler,\
+from telegram.ext import Updater, ConversationHandler, \
     MessageHandler, Filters, CommandHandler, CallbackQueryHandler
 from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardRemove
@@ -108,11 +108,13 @@ def button(update, _):
 def first_response(update, context):
     keyboard = [
         [
-            InlineKeyboardButton("Удивляться фантазии автора и полностью погружаться в новые миры", callback_data='fen'),
+            InlineKeyboardButton("Удивляться фантазии автора и полностью погружаться в новые миры",
+                                 callback_data='fen'),
             InlineKeyboardButton("Мне нравится разбираться в запутанных сюжетных линиях", callback_data='det'),
             InlineKeyboardButton("Мне нравится переживать эмоции персонажей. Радоваться и скорбить вместе с ними",
                                  callback_data='lub'),
-            InlineKeyboardButton("Нравится когда книга немного пугает и заставляет копаться в себе", callback_data='thril'),
+            InlineKeyboardButton("Нравится когда книга немного пугает и заставляет копаться в себе",
+                                 callback_data='thril'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -126,15 +128,17 @@ def second_response(update, context):
     # Мы можем использовать его во втором вопроc
     keyboard = [
         [
-            InlineKeyboardButton("Дворецкий", callback_data='Введите название'),
-            InlineKeyboardButton("Пришелец, который захватывает миры", callback_data='Введите автора'),
-            InlineKeyboardButton("На самом деле и есть жертва, и все действие происходит в голове автора",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("Никого не убил, а главные герои вместе и счастливы", callback_data='Введите автора'),
+            InlineKeyboardButton(
+                "Во время перерыва, чтобы не только прекрасно провести время, но и пораскинуть мозгами",
+                callback_data='det'),
+            InlineKeyboardButton("Везде, чтобы избежать рутины", callback_data='fen'),
+            InlineKeyboardButton("Ночью, когда вы остаетесь наедине со своими страхами",
+                                 callback_data='thril'),
+            InlineKeyboardButton("В уютном пледе и чашечкой кове, захлебываясь в слезах", callback_data='lub'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
+    update.message.reply_text("Вы читаете...", reply_markup=reply_markup)
     # Следующее текстовое сообщение будет обработано
     # обработчиком states[2]
     return 3
@@ -145,11 +149,15 @@ def third_response(update, context):
     # Мы можем использовать его во втором вопросе.
     keyboard = [
         [
-            InlineKeyboardButton("Опытный следователь, расследующий самые загадочные преступления", callback_data='det'),
-            InlineKeyboardButton("Простой парень, который влюбился по уши, но весь мир против него", callback_data='lub'),
+            InlineKeyboardButton("Опытный следователь, расследующий самые загадочные преступления",
+                                 callback_data='det'),
+            InlineKeyboardButton("Простой парень, который влюбился по уши, но весь мир против него",
+                                 callback_data='lub'),
             InlineKeyboardButton("Сын маньяка, который добрый в душе, но на него давит отец",
                                  callback_data='thril'),
-            InlineKeyboardButton("Капитан звездолета, который каждый день отправляется в космос за новыми приключениями", callback_data='fen'),
+            InlineKeyboardButton(
+                "Капитан звездолета, который каждый день отправляется в космос за новыми приключениями",
+                callback_data='fen'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -164,11 +172,11 @@ def fourth_response(update, context):
     # Мы можем использовать его во втором вопрос
     keyboard = [
         [
-            InlineKeyboardButton("способ развлечения", callback_data='Введите название'),
-            InlineKeyboardButton("способ отдыха", callback_data='Введите автора'),
+            InlineKeyboardButton("способ развлечения", callback_data='fen'),
+            InlineKeyboardButton("способ отдыха", callback_data='lub'),
             InlineKeyboardButton("способ познания мира",
-                                 callback_data='Введите автора'),
-            InlineKeyboardButton("учебник", callback_data='Введите автора'),
+                                 callback_data='det'),
+            InlineKeyboardButton("учебник", callback_data='thril'),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
