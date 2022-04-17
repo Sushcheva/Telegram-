@@ -102,7 +102,7 @@ def button(update, _):
             query.edit_message_text(text=variant)
         else:
             f.write(variant)
-    query.edit_message_text(text='Уверены?')
+            query.edit_message_text(text='Уверены?')
 
 
 def first_response(update, context):
@@ -220,23 +220,48 @@ def seventh_response(update, context):
     # Это ответ на первый вопрос.
     # Мы можем использовать его во втором вопросе.
     update.message.reply_text('Подсчет результатов...')
+    x = []
     with open('test.csv', encoding="utf8") as csvfile:
-        reader = csv.DictReader(csvfile, delimiter=';', quotechar='"')
-        expensive = sorted(reader, key=lambda x: int(x['price']), reverse=True)
+        reader = csv.reader(csvfile, delimiter=';', quotechar='"')
+        for index, row in enumerate(reader):
+            x.append(row)
     f = open("Толстой.txt", encoding="utf8")
     lines = f.readlines()
     f.close()
-    update.message.reply_text('\n'.join(d))
+    fen = 0
+    lub = 0
+    thril = 0
+    det = 0
+    for el in lines:
+        if 'fen' in el:
+            fen += 1
+        elif 'lub' in el:
+            lub += 1
+        elif 'thril' in el:
+            thril += 1
+        elif 'det' in el:
+            det += 1
+    z = max(fen, lub, thril, det)
+    if fen == z:
+        n = 3
+    elif z == lub:
+        n = 2
+    elif z == det:
+        n = 1
+    elif z == thril:
+        n = 4
+    print(x[n])
+    update.message.reply_text(x[n][0])
+    update.message.reply_text(x[n][2])
     context.bot.send_photo(
         update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
         # Ссылка на static API, по сути, ссылка на картинку.
         # Телеграму можно передать прямо её, не скачивая предварительно карту.
-        x['imageLinks']['smallThumbnail'],
+        x[n][3],
         caption="Нашёл:"
     )
-    update.message.reply_text("Вaм нравится, когда убийца...", reply_markup=reply_markup)
-    # Следующее текстовое сообщение будет обработано
-    # обработчиком states[2]
+    update.message.reply_text(f'Рекомендуем к прочтению из этого жанра: {x[n][1]} (лучшая по мнениям опроса 2021)')
+
     return ConversationHandler.END
 
 
