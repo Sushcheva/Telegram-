@@ -4,6 +4,14 @@ from telegram.ext import CommandHandler, ConversationHandler
 from telegram import ReplyKeyboardMarkup
 from geopy import geocoders
 from data import db_session
+import requests as req
+import csv
+import logging
+from telegram.ext import Updater, ConversationHandler, \
+    MessageHandler, Filters, CommandHandler, CallbackQueryHandler
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ReplyKeyboardRemove
+
 import requests
 import json
 from data.geolocation import User
@@ -12,22 +20,27 @@ TOKEN = '5146192395:AAFuwm-__5uK-tG7tfirvAWXCfo97idma54'
 WEATHER_TOKEN = ''
 current_area = ''
 new_name = ''
-WEATHER_TOKEN = 'a911cb6b-7f4b-4b40-99b4-a1a8f235ad78'
 current_name = ''
 user_markup = ReplyKeyboardMarkup([['/registration', '/enter']], one_time_keyboard=False)
 functional_markup = ReplyKeyboardMarkup([['/temperature', '/weather_conditions', '/weather', '/map'], ['change_city']])
 user_keyboard = [['/registration', '/enter']]
-functions_keyboard = [['/weather', '/conditions', '/advice'], ['/help', '/change', '/link'], ['/quit']]
 user_markup = ReplyKeyboardMarkup(user_keyboard, one_time_keyboard=True)
 functional_markup = ReplyKeyboardMarkup(functions_keyboard)
 main_flag = True
 
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+)
+
+logger = logging.getLogger(__name__)
+
 
 def registration(update, context):
+    global main_flag
     update.message.reply_text('''Вы активировали процесс регистрации. Чтобы прервать последующий диалог,
 используйте команду /stop. Пожалуйста, введите свой никнейм''')
     return 1
-    global main_flag
+
     if main_flag:
         update.message.reply_text('Вы активировали процесс регистрации. Чтобы прервать последующий диалог,'
                                   'используйте команду /stop. Пожалуйста, введите свой никнейм')
@@ -37,22 +50,7 @@ def registration(update, context):
         update.message.reply_text('Сначала завершите предыдущую задачу')
 
 
-def registration_name(update, context):
-    global new_name
-    new_name = update.message.text
-    context.user_data['name'] = update.message.text
-    db_session.global_init("db/blogs.db")
-    db_sess = db_session.create_session()
-    if context.user_data['name'] == '---':
-        update.message.reply_text('Пожалуйста, придумайте другое имя')
-        return 1
-    for user in db_sess.query(User).all():
-        if user.name == context.user_data['new_name']:
-            update.message.reply_text('Пользователь с таким именем уже существет. '
-                                      'Пожалуйста, придумайте другое')
-            return 1
-    update.message.reply_text('Теперь придумайте пароль')
-    return 2
+
 
 
 def geolocation(city: str):
@@ -77,31 +75,6 @@ def registration_password(update, context):
     functional(update, context)
     update.message.reply_text('Регистрация успешно пройдена!')
     return ConversationHandler.END
-
-
-
-
-
-def help(update, context):
-    update.message.reply_text('Вы используете бот-метеоролог. Чтобы получить доступ ко всем функциям вам необходимо'
-                              'пройти регистрацию или выполнить вход, если вы использовали бота ранее. После '
-                              'этого вам будут доступны следующие функции: выбор города проживания (/change_city),'
-                              'вывод температуры в городе проживания (/temperature), вывод погодных условий, а'
-                              'именно влажности, скорости и направления ветра, атмосферного давления '
-                              '(/weather_conditions), вывод всей информации о погоде (/weather), вывод метеокарты'
-                              '(/map)')
-    if main_flag:
-        update.message.reply_text('Вы используете бот-метеоролог. Чтобы получить доступ ко всем функциям вам необходимо'
-                                  'пройти регистрацию или выполнить вход, если вы использовали бота ранее. После '
-                                  'этого вам будут доступны следующие функции: выбор города (/change_city),'
-                                  'вывод краткой информации о погоде в выбранном городе (/weather),'
-                                  'вывод подробной информации о погоде (/conditions),'
-                                  'совет о том, что надеть в такую погоду (/advice),'
-                                  'ссылка на сайт Яндекс.Погоды, где можно найти более'
-                                  'подробную информацию и метеокарту (/link).'
-                                  'Для отмены действия воспользуйтесь командой /stop')
-    else:
-        update.message.reply_text('Сначала завершите предыдущую задачу')
 
 
 def stop(update, context):
@@ -131,7 +104,7 @@ def start(update, context):
     global main_flag
     main_flag = True
     context.user_data['name'] = '---'
-    update.message.reply_text('Добро пожаловать в бот-метеоролог! Чтобы начать '
+    update.message.reply_text('Добро пожаловать в бот-библиотекарь! Чтобы начать поиск '
                               'пройдите регистрацию или выполните вход', reply_markup=user_markup)
 
 
@@ -147,23 +120,21 @@ def functional(update, context):
             break
     update.message.reply_text(f'Добро пожаловать, {context.user_data["name"]}! ')
 
+    def start(update, context):
+        reply_keyboard = [['/search_book', '/test'],
+                          ['/site', '/work_time'],
+                          ['/phone', '/address']
+                          ]
+        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+        update.message.reply_text(
+            "Я бот-справочник. Что вы хотите получить?",
+            reply_markup=markup
+        )
 
-import requests as req
-import csv
-import logging
-from telegram.ext import Updater, ConversationHandler, \
-    MessageHandler, Filters, CommandHandler, CallbackQueryHandler
-from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram import ReplyKeyboardRemove
+
 
 # Запускаем логгирование
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
-)
 
-logger = logging.getLogger(__name__)
-
-TOKEN = '5146192395:AAFuwm-__5uK-tG7tfirvAWXCfo97idma54'
 
 
 def close_keyboard(update, context):
@@ -173,16 +144,6 @@ def close_keyboard(update, context):
     )
 
 
-def start(update, context):
-    reply_keyboard = [['/search_book', '/test'],
-                      ['/site', '/work_time'],
-                      ['/phone', '/address']
-                      ]
-    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
-    update.message.reply_text(
-        "Я бот-справочник. Что вы хотите получить?",
-        reply_markup=markup
-    )
 
 
 def help(update, context):
@@ -227,6 +188,7 @@ def site(update, context):
 
 def param(update, context):
     global variant
+    global new_name
     print(update.message.text)
     if variant == 'Введите название':
         context.user_data['dan'] = update.message.text
@@ -234,6 +196,23 @@ def param(update, context):
     elif variant == 'Введите автора':
         context.user_data['dan'] = update.message.text
         search_by_author(update, context)
+    elif  :
+        def registration_name(update, context):
+            global new_name
+            new_name = update.message.text
+            context.user_data['name'] = update.message.text
+            db_session.global_init("db/blogs.db")
+            db_sess = db_session.create_session()
+            if context.user_data['name'] == '---':
+                update.message.reply_text('Пожалуйста, придумайте другое имя')
+                return 1
+            for user in db_sess.query(User).all():
+                if user.name == context.user_data['new_name']:
+                    update.message.reply_text('Пользователь с таким именем уже существет. '
+                                              'Пожалуйста, придумайте другое')
+                    return 1
+            update.message.reply_text('Теперь придумайте пароль')
+            return 2
 
 
 def button(update, _):
@@ -500,54 +479,9 @@ def stop(update, context):
     return ConversationHandler.END
 
 
-def main():
-    updater = Updater(TOKEN)
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler("close", close_keyboard))
-    dp.add_handler(CommandHandler("address", address))
-    dp.add_handler(CommandHandler("phone", phone))
-    conv_handler = ConversationHandler(
-        # Точка входа в диалог.
-        # В данном случае — команда /start. Она задаёт первый вопрос.
-        entry_points=[CommandHandler('test', test)],
-
-        # Состояние внутри диалога.
-        # Вариант с двумя обработчиками, фильтрующими текстовые сообщения.
-        states={
-            # Функция читает ответ на первый вопрос и задаёт второй.
-            1: [MessageHandler(Filters.text & ~Filters.command, first_response)],
-            # Функция читает ответ на второй вопрос и завершает диалог.
-            2: [MessageHandler(Filters.text & ~Filters.command, second_response)],
-            3: [MessageHandler(Filters.text & ~Filters.command, third_response)],
-            # Функция читает ответ на второй вопрос и завершает диалог.
-            4: [MessageHandler(Filters.text & ~Filters.command, fourth_response)],
-            5: [MessageHandler(Filters.text & ~Filters.command, fifth_response)],
-            # Функция читает ответ на второй вопрос и завершает диалог.
-            6: [MessageHandler(Filters.text & ~Filters.command, sixth_response)],
-            7: [MessageHandler(Filters.text & ~Filters.command, seventh_response)]
-        },
-
-        # Точка прерывания диалога. В данном случае — команда /stop.
-        fallbacks=[CommandHandler('stop', stop)]
-    )
-
-    dp.add_handler(conv_handler)
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("site", site))
-    dp.add_handler(CommandHandler("search_book", search_book))
-    dp.add_handler(CommandHandler("search_by_author", search_by_author))
-    dp.add_handler(CommandHandler("search_by_name", search_by_name))
-    dp.add_handler(CommandHandler("work_time", work_time))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True))
-    dp.add_handler(CallbackQueryHandler(button))
-    dp.add_handler(CommandHandler("help", help))
-    updater.start_polling()
-
-    updater.idle()
 
 
-if __name__ == '__main__':
-    main()
+
 
 def change(update, context):
     if context.user_data['name'] != '---':
@@ -658,7 +592,53 @@ def quit(update, context):
                               reply_markup=user_markup)
 
 
+
+
 def main():
+    updater = Updater(TOKEN)
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("close", close_keyboard))
+    dp.add_handler(CommandHandler("address", address))
+    dp.add_handler(CommandHandler("phone", phone))
+    conv_handler4 = ConversationHandler(
+        # Точка входа в диалог.
+        # В данном случае — команда /start. Она задаёт первый вопрос.
+        entry_points=[CommandHandler('test', test)],
+
+        # Состояние внутри диалога.
+        # Вариант с двумя обработчиками, фильтрующими текстовые сообщения.
+        states={
+            # Функция читает ответ на первый вопрос и задаёт второй.
+            1: [MessageHandler(Filters.text & ~Filters.command, first_response)],
+            # Функция читает ответ на второй вопрос и завершает диалог.
+            2: [MessageHandler(Filters.text & ~Filters.command, second_response)],
+            3: [MessageHandler(Filters.text & ~Filters.command, third_response)],
+            # Функция читает ответ на второй вопрос и завершает диалог.
+            4: [MessageHandler(Filters.text & ~Filters.command, fourth_response)],
+            5: [MessageHandler(Filters.text & ~Filters.command, fifth_response)],
+            # Функция читает ответ на второй вопрос и завершает диалог.
+            6: [MessageHandler(Filters.text & ~Filters.command, sixth_response)],
+            7: [MessageHandler(Filters.text & ~Filters.command, seventh_response)]
+        },
+
+        # Точка прерывания диалога. В данном случае — команда /stop.
+        fallbacks=[CommandHandler('stop', stop)]
+    )
+
+    dp.add_handler(conv_handler4)
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("site", site))
+    dp.add_handler(CommandHandler("search_book", search_book))
+    dp.add_handler(CommandHandler("search_by_author", search_by_author))
+    dp.add_handler(CommandHandler("search_by_name", search_by_name))
+    dp.add_handler(CommandHandler("work_time", work_time))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True))
+    dp.add_handler(CallbackQueryHandler(button))
+    dp.add_handler(CommandHandler("help", help))
+    updater.start_polling()
+
+    updater.idle()
+
     updater = Updater(TOKEN, use_context=True)
 
     dp = updater.dispatcher
@@ -688,8 +668,6 @@ def main():
             2: [MessageHandler(Filters.text & ~Filters.command, enter_password, pass_user_data=True)]
         },
         fallbacks=[CommandHandler('stop', stop)])
-
-
 
     dp.add_handler(conv_handler1)
     dp.add_handler(conv_handler2)
