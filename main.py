@@ -58,6 +58,8 @@ def geolocation(city: str):
 
 
 def registration_password(update, context):
+    global variant
+    variant = ''
     password = update.message.text
     db_session.global_init("db/cities.db")
     db_sess = db_session.create_session()
@@ -190,8 +192,8 @@ def param(update, context):
     elif variant == 'Введите автора':
         context.user_data['dan'] = update.message.text
         search_by_author(update, context)
-    elif variant == 'no':
-        variant = ''
+    else :
+
         new_name = update.message.text
         context.user_data['name'] = update.message.text
         db_session.global_init("db/blogs.db")
@@ -619,6 +621,8 @@ def main():
     conv_handler1 = ConversationHandler(
         entry_points=[CommandHandler('registration', registration)],
         states={
+            1: [MessageHandler(Filters.text & ~Filters.command, param)],
+            2: [MessageHandler(Filters.text & ~Filters.command, registration_password)],
             1: [MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True)],
             2: [MessageHandler(Filters.text & ~Filters.command, registration_password, pass_user_data=True)]
         },
