@@ -25,7 +25,6 @@ user_markup = ReplyKeyboardMarkup([['/registration', '/enter']], one_time_keyboa
 functional_markup = ReplyKeyboardMarkup([['/temperature', '/weather_conditions', '/weather', '/map'], ['change_city']])
 user_keyboard = [['/registration', '/enter']]
 user_markup = ReplyKeyboardMarkup(user_keyboard, one_time_keyboard=True)
-functional_markup = ReplyKeyboardMarkup(functions_keyboard)
 main_flag = True
 
 logging.basicConfig(
@@ -36,11 +35,12 @@ logger = logging.getLogger(__name__)
 
 
 def registration(update, context):
-    global main_flag
+    global main_flag, variant
     update.message.reply_text('''Вы активировали процесс регистрации. Чтобы прервать последующий диалог,
 используйте команду /stop. Пожалуйста, введите свой никнейм''')
+    variant = 'no'
     return 1
-
+    global main_flag
     if main_flag:
         update.message.reply_text('Вы активировали процесс регистрации. Чтобы прервать последующий диалог,'
                                   'используйте команду /stop. Пожалуйста, введите свой никнейм')
@@ -48,9 +48,6 @@ def registration(update, context):
         return 1
     else:
         update.message.reply_text('Сначала завершите предыдущую задачу')
-
-
-
 
 
 def geolocation(city: str):
@@ -83,6 +80,7 @@ def stop(update, context):
     update.message.reply_text('Действие отменено')
     return ConversationHandler.END
 
+
 def enter_name(update, context):
     global current_name
     current_name = update.message.text
@@ -100,6 +98,7 @@ def enter_name(update, context):
         current_name = ''
         return ConversationHandler.END
 
+
 def start(update, context):
     global main_flag
     main_flag = True
@@ -110,7 +109,7 @@ def start(update, context):
 
 def functional(update, context):
     update.message.reply_text('Добро пожаловать!'
-                              'Вам доступны следующие функции:', reply_markup=functional_markup)
+                              'Вам доступны следующие функции:')
     db_session.global_init("db/cities.db")
     db_sess = db_session.create_session()
     city = ''
@@ -120,21 +119,18 @@ def functional(update, context):
             break
     update.message.reply_text(f'Добро пожаловать, {context.user_data["name"]}! ')
 
-    def start(update, context):
-        reply_keyboard = [['/search_book', '/test'],
-                          ['/site', '/work_time'],
-                          ['/phone', '/address']
-                          ]
-        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
-        update.message.reply_text(
-            "Я бот-справочник. Что вы хотите получить?",
-            reply_markup=markup
-        )
-
+    reply_keyboard = [['/search_book', '/test'],
+                      ['/site', '/work_time'],
+                      ['/phone', '/address']
+                      ]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+    update.message.reply_text(
+        "Я бот-справочник. Что вы хотите получить?",
+        reply_markup=markup
+    )
 
 
 # Запускаем логгирование
-
 
 
 def close_keyboard(update, context):
@@ -142,8 +138,6 @@ def close_keyboard(update, context):
         "Ok",
         reply_markup=ReplyKeyboardRemove()
     )
-
-
 
 
 def help(update, context):
@@ -196,23 +190,22 @@ def param(update, context):
     elif variant == 'Введите автора':
         context.user_data['dan'] = update.message.text
         search_by_author(update, context)
-    elif  :
-        def registration_name(update, context):
-            global new_name
-            new_name = update.message.text
-            context.user_data['name'] = update.message.text
-            db_session.global_init("db/blogs.db")
-            db_sess = db_session.create_session()
-            if context.user_data['name'] == '---':
-                update.message.reply_text('Пожалуйста, придумайте другое имя')
+    elif variant == 'no':
+        variant = ''
+        new_name = update.message.text
+        context.user_data['name'] = update.message.text
+        db_session.global_init("db/blogs.db")
+        db_sess = db_session.create_session()
+        if context.user_data['name'] == '---':
+            update.message.reply_text('Пожалуйста, придумайте другое имя')
+            return 1
+        for user in db_sess.query(User).all():
+            if user.name == context.user_data['new_name']:
+                update.message.reply_text('Пользователь с таким именем уже существет. '
+                                          'Пожалуйста, придумайте другое')
                 return 1
-            for user in db_sess.query(User).all():
-                if user.name == context.user_data['new_name']:
-                    update.message.reply_text('Пользователь с таким именем уже существет. '
-                                              'Пожалуйста, придумайте другое')
-                    return 1
-            update.message.reply_text('Теперь придумайте пароль')
-            return 2
+        update.message.reply_text('Теперь придумайте пароль')
+        return 2
 
 
 def button(update, _):
@@ -479,10 +472,6 @@ def stop(update, context):
     return ConversationHandler.END
 
 
-
-
-
-
 def change(update, context):
     if context.user_data['name'] != '---':
         update.message.reply_text('Хотите поменять город проживания?'
@@ -524,9 +513,6 @@ def enter(update, context):
         update.message.reply_text('Сначала завершите предыдущую задачу')
 
 
-
-
-
 def enter_password(update, context):
     global main_flag
     main_flag = True
@@ -550,8 +536,6 @@ def enter_password(update, context):
         return ConversationHandler.END
 
 
-
-
 def link(update, context):
     if main_flag:
         if context.user_data['name'] != '---':
@@ -561,12 +545,6 @@ def link(update, context):
             update.message.reply_text('Сначала войдите в систему')
     else:
         update.message.reply_text('Сначала завершите предыдущую задачу')
-
-
-
-
-
-
 
 
 def conditions(update, context):
@@ -584,14 +562,10 @@ def conditions(update, context):
         update.message.reply_text('Сначала завершите предыдущую задачу')
 
 
-
-
 def quit(update, context):
     context.user_data['name'] = '---'
     update.message.reply_text('Вы вышли из системы. Чтобы продолжить работу, пожалуйста, войдите заново.',
                               reply_markup=user_markup)
-
-
 
 
 def main():
@@ -626,7 +600,6 @@ def main():
     )
 
     dp.add_handler(conv_handler4)
-    dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("site", site))
     dp.add_handler(CommandHandler("search_book", search_book))
     dp.add_handler(CommandHandler("search_by_author", search_by_author))
@@ -635,14 +608,8 @@ def main():
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True))
     dp.add_handler(CallbackQueryHandler(button))
     dp.add_handler(CommandHandler("help", help))
-    updater.start_polling()
 
-    updater.idle()
-
-    updater = Updater(TOKEN, use_context=True)
-
-    dp = updater.dispatcher
-    text_handler = MessageHandler(Filters.text, registration_name)
+    text_handler = MessageHandler(Filters.text, param)
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('start', start, pass_user_data=True))
     dp.add_handler(CommandHandler('help', help))
@@ -652,9 +619,7 @@ def main():
     conv_handler1 = ConversationHandler(
         entry_points=[CommandHandler('registration', registration)],
         states={
-            1: [MessageHandler(Filters.text & ~Filters.command, registration_name)],
-            2: [MessageHandler(Filters.text & ~Filters.command, registration_password)],
-            1: [MessageHandler(Filters.text & ~Filters.command, registration_name, pass_user_data=True)],
+            1: [MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True)],
             2: [MessageHandler(Filters.text & ~Filters.command, registration_password, pass_user_data=True)]
         },
         fallbacks=[CommandHandler('stop', stop)]
