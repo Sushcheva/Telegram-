@@ -463,7 +463,6 @@ def search_by_author(update, context):
             caption="Нашёл:"
         )
 
-        update.message.reply_text(x['averageRating'])
 
 
 def work_time(update, context):
