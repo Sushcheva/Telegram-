@@ -85,6 +85,7 @@ def stop(update, context):
 
 def enter_name(update, context):
     global current_name
+    variant = 'ent2'
     current_name = update.message.text
     f = False
     db_session.global_init("db/blogs.db")
@@ -215,6 +216,12 @@ def param(update, context):
             variant = 'reg2'
     elif variant == 'reg2':
         return registration_password(update, context)
+    elif variant == 'ent1':
+        x = enter_name(update, context)
+        if x != 21:
+            variant = 'ent2'
+    elif variant == 'ent2':
+        return enter_password(update, context)
 
 
 def button(update, _):
@@ -508,8 +515,10 @@ def change_city_handling(update, context):
 
 
 def enter(update, context):
+    global variant
     update.message.reply_text('''Вы активировали процесс входа. Чтобы прервать последующий диалог,
     используйте команду /stop. Пожалуйста, введите свой никнейм''')
+    variant = 'ent1'
     return 21
     global main_flag
     if main_flag:
@@ -636,9 +645,8 @@ def main():
     conv_handler2 = ConversationHandler(
         entry_points=[CommandHandler('enter', enter)],
         states={
-            21: [MessageHandler(Filters.text & ~Filters.command, enter_name)],
-            22: [MessageHandler(Filters.text & ~Filters.command, enter_password)],
-            22: [MessageHandler(Filters.text & ~Filters.command, enter_password, pass_user_data=True)]
+            21: [MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True)],
+            22: [MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True)]
         },
         fallbacks=[CommandHandler('stop', stop)])
 
