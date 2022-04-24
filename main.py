@@ -38,14 +38,14 @@ def registration(update, context):
     global main_flag, variant
     update.message.reply_text('''Вы активировали процесс регистрации. Чтобы прервать последующий диалог,
 используйте команду /stop. Пожалуйста, введите свой никнейм''')
-    variant = 'no'
-    return 1
+    variant = 'reg1'
+    return 11
     global main_flag
     if main_flag:
         update.message.reply_text('Вы активировали процесс регистрации. Чтобы прервать последующий диалог,'
                                   'используйте команду /stop. Пожалуйста, введите свой никнейм')
         main_flag = False
-        return 1
+        return 11
     else:
         update.message.reply_text('Сначала завершите предыдущую задачу')
 
@@ -67,7 +67,7 @@ def registration_password(update, context):
     user = User()
     user.name = new_name
     user.password = password
-    user.name = context.user_data['new_name']
+    user.name = context.user_data['name']
     user.password = context.user_data['password']
     db_sess.add(user)
     db_sess.commit()
@@ -94,7 +94,7 @@ def enter_name(update, context):
             f = True
     if f:
         update.message.reply_text('Введите ваш пароль')
-        return 2
+        return 22
     else:
         update.message.reply_text('Пользователь с таким именем не найден')
         current_name = ''
@@ -115,10 +115,8 @@ def functional(update, context):
     db_session.global_init("db/cities.db")
     db_sess = db_session.create_session()
     city = ''
-    for user in db_sess.query(User).all():
-        if user.name == context.user_data["name"]:
-            city = user.constant_city
-            break
+
+
     update.message.reply_text(f'Добро пожаловать, {context.user_data["name"]}! ')
 
     reply_keyboard = [['/search_book', '/test'],
@@ -181,33 +179,42 @@ def site(update, context):
     update.message.reply_text(
         "Сайт: http://www.yandex.ru/company")
 
+def registration_name(update, context):
+    global new_name
+    variant = 'reg2'
+    new_name = update.message.text
+    context.user_data['name'] = update.message.text
+    db_session.global_init("db/blogs.db")
+    db_sess = db_session.create_session()
+    if context.user_data['name'] == '---':
+        update.message.reply_text('Пожалуйста, придумайте другое имя')
+        return 11
+    for user in db_sess.query(User).all():
+        if user.name == context.user_data['name']:
+            update.message.reply_text('Пользователь с таким именем уже существет. '
+                                      'Пожалуйста, придумайте другое')
+            return 11
+
+    update.message.reply_text('Теперь придумайте пароль')
+    return 12
 
 def param(update, context):
     global variant
     global new_name
     print(update.message.text)
+    print(variant)
     if variant == 'Введите название':
         context.user_data['dan'] = update.message.text
         search_by_name(update, context)
     elif variant == 'Введите автора':
         context.user_data['dan'] = update.message.text
         search_by_author(update, context)
-    else :
-
-        new_name = update.message.text
-        context.user_data['name'] = update.message.text
-        db_session.global_init("db/blogs.db")
-        db_sess = db_session.create_session()
-        if context.user_data['name'] == '---':
-            update.message.reply_text('Пожалуйста, придумайте другое имя')
-            return 1
-        for user in db_sess.query(User).all():
-            if user.name == context.user_data['new_name']:
-                update.message.reply_text('Пользователь с таким именем уже существет. '
-                                          'Пожалуйста, придумайте другое')
-                return 1
-        update.message.reply_text('Теперь придумайте пароль')
-        return 2
+    elif variant == 'reg1':
+        x = registration_name(update, context)
+        if x != 11:
+            variant = 'reg2'
+    elif variant == 'reg2':
+        return registration_password(update, context)
 
 
 def button(update, _):
@@ -422,7 +429,6 @@ def search_by_name(update, context):
             caption="Нашёл:"
         )
 
-        update.message.reply_text(x['averageRating'])
 
 
 def search_by_author(update, context):
@@ -504,13 +510,13 @@ def change_city_handling(update, context):
 def enter(update, context):
     update.message.reply_text('''Вы активировали процесс входа. Чтобы прервать последующий диалог,
     используйте команду /stop. Пожалуйста, введите свой никнейм''')
-    return 1
+    return 21
     global main_flag
     if main_flag:
         update.message.reply_text('Вы активировали процесс входа. Чтобы прервать последующий диалог, '
                                   'используйте команду /stop. Пожалуйста, введите свой никнейм')
         main_flag = False
-        return 1
+        return 21
     else:
         update.message.reply_text('Сначала завершите предыдущую задачу')
 
@@ -621,10 +627,8 @@ def main():
     conv_handler1 = ConversationHandler(
         entry_points=[CommandHandler('registration', registration)],
         states={
-            1: [MessageHandler(Filters.text & ~Filters.command, param)],
-            2: [MessageHandler(Filters.text & ~Filters.command, registration_password)],
-            1: [MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True)],
-            2: [MessageHandler(Filters.text & ~Filters.command, registration_password, pass_user_data=True)]
+            11: [MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True)],
+            12: [MessageHandler(Filters.text & ~Filters.command, param, pass_user_data=True)]
         },
         fallbacks=[CommandHandler('stop', stop)]
     )
@@ -632,9 +636,9 @@ def main():
     conv_handler2 = ConversationHandler(
         entry_points=[CommandHandler('enter', enter)],
         states={
-            1: [MessageHandler(Filters.text & ~Filters.command, enter_name)],
-            2: [MessageHandler(Filters.text & ~Filters.command, enter_password)],
-            2: [MessageHandler(Filters.text & ~Filters.command, enter_password, pass_user_data=True)]
+            21: [MessageHandler(Filters.text & ~Filters.command, enter_name)],
+            22: [MessageHandler(Filters.text & ~Filters.command, enter_password)],
+            22: [MessageHandler(Filters.text & ~Filters.command, enter_password, pass_user_data=True)]
         },
         fallbacks=[CommandHandler('stop', stop)])
 
