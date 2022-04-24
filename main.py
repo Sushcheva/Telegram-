@@ -414,9 +414,10 @@ def seventh_response(update, context):
 def search_by_name(update, context):
     d = context.user_data['dan']
     resp = req.get(
-        f"https://www.googleapis.com/books/v1/volumes?q=intitle+{d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
-    z = resp.json()['items']
+        f"https://www.googleapis.com/books/v1/volumes?q={d}+inauthor:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
+    y = resp.json()
     print(resp.json())
+    z = y['items']
     f = 0
     for el in z:
         d = []
@@ -435,13 +436,14 @@ def search_by_name(update, context):
             x['imageLinks']['smallThumbnail'],
             caption="Нашёл:"
         )
+        update.message.reply_text(x['infoLink'])
 
 
 
 def search_by_author(update, context):
     d = context.user_data['dan']
     resp = req.get(
-        f"https://www.googleapis.com/books/v1/volumes?q=inauthor+{d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
+        f"https://www.googleapis.com/books/v1/volumes?q={d}:keyes&key=AIzaSyBW1ihw2fnM8jpQg1C-r77bAUYm-WhjJ20")
     z = resp.json()['items']
     print(resp.json())
     f = 0
