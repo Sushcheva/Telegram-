@@ -50,13 +50,6 @@ def registration(update, context):
         update.message.reply_text('Сначала завершите предыдущую задачу')
 
 
-def geolocation(city: str):
-    geolocator = geocoders.Nominatim(user_agent="telebot")
-    latitude = str(geolocator.geocode(city).latitude)
-    longitude = str(geolocator.geocode(city).longitude)
-    return latitude, longitude
-
-
 def registration_password(update, context):
     global variant
     variant = ''
@@ -173,7 +166,7 @@ def address(update, context):
 
 
 def phone(update, context):
-    update.message.reply_text("Телефон Марии Егоровны: +7(911)004-1574")
+    update.message.reply_text("Телефон Марии Егоровны: +7(911)004-16-74")
 
 
 def site(update, context):
@@ -502,33 +495,6 @@ def stop(update, context):
     return ConversationHandler.END
 
 
-def change(update, context):
-    if context.user_data['name'] != '---':
-        update.message.reply_text('Хотите поменять город проживания?'
-                                  'Хорошо, введите новое место:')
-        global main_flag
-        main_flag = False
-        return 1
-    else:
-        update.message.reply_text('Сначала войдите в систему')
-        return ConversationHandler.END
-
-
-def change_city_handling(update, context):
-    global main_flag
-    main_flag = True
-    new_city = update.message.text
-    db_session.global_init("db/cities.db")
-    db_sess = db_session.create_session()
-    context.user_data['current_area'] = new_city
-    for user in db_sess.query(User).all():
-        if user.name == context.user_data["name"]:
-            user.constant_city = new_city
-            db_sess.commit()
-    update.message.reply_text('Город проживания успешно изменен')
-    return ConversationHandler.END
-
-
 def enter(update, context):
     global variant
     update.message.reply_text('''Вы активировали процесс входа. Чтобы прервать последующий диалог,
@@ -579,19 +545,6 @@ def link(update, context):
         update.message.reply_text('Сначала завершите предыдущую задачу')
 
 
-def conditions(update, context):
-    global main_flag
-    if main_flag:
-        main_flag = False
-        if context.user_data['name'] != '---':
-            update.message.reply_text('Введите название города, для которого хотите '
-                                      'узнать подробную информацию о погоде')
-            return 1
-        else:
-            update.message.reply_text('Сначала войдите в систему')
-            return ConversationHandler.END
-    else:
-        update.message.reply_text('Сначала завершите предыдущую задачу')
 
 
 def quit(update, context):
